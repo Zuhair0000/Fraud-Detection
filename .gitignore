@@ -1,0 +1,14 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# ML files
+*.pth
+*.joblib
+
+# Dataset
+Base.csv
+
+# Node
+node_modules/
