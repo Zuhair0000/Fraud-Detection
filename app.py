@@ -88,8 +88,6 @@ async def predict_fraud(transaction: TransactionRequest):
             output_logit = model(tensor_data)
             probability = torch.sigmoid(output_logit).item()
             
-            print(f"🔥 DEBUG -> Raw Model Probability for this customer: {probability:.4f}")
-
             is_fraud = bool(probability > 0.95) 
             
         explanation = []
