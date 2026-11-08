@@ -1,14 +1,18 @@
 # Python
 venv/
+.venv/
 __pycache__/
 *.pyc
+
+# Jupyter
+.ipynb_checkpoints/
 
 # ML files
 *.pth
 *.joblib
 
 # Dataset
-Base.csv
+*.csv
 
 # Node
 node_modules/

@@ -13,6 +13,8 @@ function App() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  // Set when the form holds a real held-out transaction; cleared on manual edits.
+  const [realCase, setRealCase] = useState(null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,6 +22,30 @@ function App() {
       ...formData,
       [name]: e.target.type === "number" ? Number(value) : value,
     });
+    // Once edited, the form no longer matches the real row, so fall back to manual mode.
+    setRealCase(null);
+  };
+
+  const loadRealCase = async (label) => {
+    setError(null);
+    setResult(null);
+    try {
+      const { data } = await axios.get(
+        "http://localhost:8000/sample_transaction",
+        { params: { label } },
+      );
+      setFormData({
+        // The dataset stores income as a 0.1-0.9 decile; the form shows dollars.
+        income: Math.round(data.income * 100000),
+        name_email_similarity: Number(data.name_email_similarity.toFixed(4)),
+        prev_address_months_count: data.prev_address_months_count,
+        device_os: data.device_os,
+        payment_type: data.payment_type,
+      });
+      setRealCase({ id: data.transaction_id, trueLabel: data.true_label });
+    } catch (err) {
+      setError(err.response?.data?.detail || err.message);
+    }
   };
 
   const checkTransaction = async (e) => {
@@ -31,7 +57,7 @@ function App() {
     try {
       const response = await axios.post(
         "http://localhost:8000/predict_fraud",
-        formData,
+        realCase ? { ...formData, transaction_id: realCase.id } : formData,
       );
       setResult(response.data);
     } catch (err) {
@@ -60,6 +86,31 @@ function App() {
         <div className="p-8">
           {/* THE INPUT FORM */}
           <form onSubmit={checkTransaction} className="space-y-6">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => loadRealCase("fraud")}
+                className="py-2.5 px-4 rounded-lg border border-rose-300 bg-rose-50 text-sm font-semibold text-rose-800 hover:bg-rose-100 transition-colors"
+              >
+                Load real fraud case
+              </button>
+              <button
+                type="button"
+                onClick={() => loadRealCase("legit")}
+                className="py-2.5 px-4 rounded-lg border border-emerald-300 bg-emerald-50 text-sm font-semibold text-emerald-800 hover:bg-emerald-100 transition-colors"
+              >
+                Load real legit case
+              </button>
+            </div>
+
+            {realCase && (
+              <p className="text-sm text-slate-600 bg-slate-100 rounded-lg px-4 py-2">
+                Held-out transaction <strong>#{realCase.id}</strong> loaded. The
+                model will score the full real row. Editing any field switches
+                back to manual mode.
+              </p>
+            )}
+
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
               <label className="block text-sm font-semibold text-slate-700">
                 Reported Income
@@ -108,6 +159,7 @@ function App() {
                   <option value="macintosh">Macintosh</option>
                   <option value="linux">Linux</option>
                   <option value="x11">X11</option>
+                  <option value="other">Other</option>
                 </select>
               </label>
 
@@ -121,6 +173,10 @@ function App() {
                 >
                   <option value="AC">AC (ACH/Bank Transfer)</option>
                   <option value="CC">CC (Credit Card)</option>
+                  <option value="AA">AA</option>
+                  <option value="AB">AB</option>
+                  <option value="AD">AD</option>
+                  <option value="AE">AE</option>
                 </select>
               </label>
             </div>
@@ -199,6 +255,22 @@ function App() {
                     {(result.confidence * 100).toFixed(2)}%
                   </span>
                 </p>
+
+                {result.true_label && (
+                  <p className="text-sm mb-4 text-slate-700">
+                    <strong className="font-semibold">
+                      Actual label (transaction #{result.transaction_id}):
+                    </strong>{" "}
+                    <span
+                      className={`font-bold ${result.true_label === "fraud" ? "text-rose-700" : "text-emerald-700"}`}
+                    >
+                      {result.true_label.toUpperCase()}
+                    </span>{" "}
+                    {(result.true_label === "fraud") === result.fraud_detected
+                      ? "✓ model was correct"
+                      : "✗ model was wrong"}
+                  </p>
+                )}
 
                 {/* Render the XAI Audit Trail if it exists */}
                 {result.fraud_detected && Array.isArray(result.audit_trail) && (
