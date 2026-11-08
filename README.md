@@ -26,8 +26,6 @@ Only **1.15%** of applications in the dataset are fraud. A model can reach 99% a
 
 **The trade-off:** the model is tuned to miss as little fraud as possible, at the cost of many false alarms that an analyst would review. In a real system, the threshold would be chosen with the business, based on the cost of a missed fraud compared with the cost of a manual review.
 
-<img width="860" height="797" alt="Screenshot 2026-11-08 at 8 34 07 PM" src="https://github.com/user-attachments/assets/a7750f40-bf6f-4f92-bd0a-fcfa5fce569d" />
-
 ## Tech stack
 **ML:** Python · Polars · pandas · scikit-learn · PyTorch · Captum
 **Backend:** FastAPI · Pydantic · Uvicorn
