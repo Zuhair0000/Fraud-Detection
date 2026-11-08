@@ -2,7 +2,7 @@
 
 An end-to-end fraud detection system: a PyTorch neural network trained on highly imbalanced bank-account application data, served through a FastAPI endpoint, with a React dashboard that shows **why** each transaction was flagged using Captum Integrated Gradients.
 
-<img width="1058" height="884" alt="Screenshot 2026-11-08 at 8 47 53 PM" src="https://github.com/user-attachments/assets/d5a84475-8f76-4c38-89d9-b64e1b409d28" />
+<img width="1058" height="884" alt="Screenshot 2026-11-08 at 8 47 53 PM" src="https://github.com/user-attachments/assets/2bf21420-2b7d-4b0f-922f-c2985b33c70d" />
 
 ## The problem
 Only **1.15%** of applications in the dataset are fraud. A model can reach 99% accuracy by never predicting fraud, which is useless. This project optimises for **catching fraud (recall)** instead, and explains every flag so an analyst can review the decision.
@@ -25,6 +25,8 @@ Only **1.15%** of applications in the dataset are fraud. A model can reach 99% a
 | Decision threshold | 0.5 |
 
 **The trade-off:** the model is tuned to miss as little fraud as possible, at the cost of many false alarms that an analyst would review. In a real system, the threshold would be chosen with the business, based on the cost of a missed fraud compared with the cost of a manual review.
+
+<img width="860" height="797" alt="Screenshot 2026-11-08 at 8 34 07 PM" src="https://github.com/user-attachments/assets/cc6303ba-2075-4968-b4b8-8b3dc7168051" />
 
 ## Tech stack
 **ML:** Python · Polars · pandas · scikit-learn · PyTorch · Captum
@@ -66,4 +68,4 @@ Fraud-Detection/
 - Trained on a 10,000-row sample for speed; training on the full dataset should improve precision.
 - Tune the decision threshold on a separate validation set rather than using a fixed 0.5.
 - Compare against gradient boosting models (XGBoost, LightGBM), which are strong on tabular data.
-- Add automated tests for the API.<img width="1058" height="884" alt="Screenshot 2026-11-08 at 8 47 53 PM" src="https://github.com/user-attachments/assets/174bb1ae-dd53-4199-a679-3e2e8749b551" />
+- Add automated tests for the API.![Uploading Screenshot 2026-11-08 at 8.47.53 PM.png…]()
